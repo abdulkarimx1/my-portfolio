@@ -1,119 +1,140 @@
 "use client";
 
-import { motion, useMotionValue, useMotionTemplate } from "motion/react";
-import { ExternalLink, Code } from "lucide-react";
-import { MouseEvent } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 
 const projects = [
   {
-    id: 1,
-    title: "E-Commerce Experience",
-    description: "A headless commerce platform with lightning-fast page loads and dynamic cart management.",
-    tags: ["Next.js", "Tailwind", "Shopify"],
-    demoUrl: "#",
-    codeUrl: "#",
+    number: "01",
+    title: "Chopstx",
+    category: "Branding / Campaigns / Spatial",
+    year: "2026",
+    tone: "from-[#161616] via-[#262626] to-[#0d0d0d]",
+    accent: "CHOPSTX",
   },
   {
-    id: 2,
-    title: "SaaS Dashboard",
-    description: "Interactive analytics dashboard featuring real-time data visualization and customizable widgets.",
-    tags: ["React", "Framer Motion", "Recharts"],
-    demoUrl: "#",
-    codeUrl: "#",
+    number: "02",
+    title: "Abo Wadih",
+    category: "Identity / Packaging / Campaign",
+    year: "2026",
+    tone: "from-[#262626] via-[#171717] to-[#0b0b0b]",
+    accent: "ABO WADIH",
   },
   {
-    id: 3,
-    title: "Web3 NFT Platform",
-    description: "Decentralized application for minting and trading digital assets with smart contract integration.",
-    tags: ["TypeScript", "Ethers.js", "Solidity"],
-    demoUrl: "#",
-    codeUrl: "#",
-  }
+    number: "03",
+    title: "Over!",
+    category: "Identity / Packaging / Activation",
+    year: "2025",
+    tone: "from-[#101010] via-[#292929] to-[#151515]",
+    accent: "OVER!",
+  },
 ];
 
-export default function Projects() {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  function handleMouseMove({ currentTarget, clientX, clientY }: MouseEvent) {
-    const { left, top } = currentTarget.getBoundingClientRect();
-    mouseX.set(clientX - left);
-    mouseY.set(clientY - top);
-  }
+function ProjectVisual({ project }: { project: (typeof projects)[number] }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 120, damping: 18 });
+  const sy = useSpring(y, { stiffness: 120, damping: 18 });
+  const rotate = useTransform(sx, [-50, 50], [-1.5, 1.5]);
 
   return (
-    <section id="projects" className="py-32 px-6 bg-black relative">
-      <div className="max-w-6xl mx-auto relative z-10">
-        
-        {/* Section Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+    <motion.div
+      onPointerMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        x.set((e.clientX - r.left - r.width / 2) * 0.05);
+        y.set((e.clientY - r.top - r.height / 2) * 0.05);
+      }}
+      onPointerLeave={() => {
+        x.set(0);
+        y.set(0);
+      }}
+      className="relative aspect-[16/10] overflow-hidden rounded-[1.5rem] bg-zinc-900"
+    >
+      <motion.div
+        style={{ x: sx, y: sy, rotate }}
+        className={`absolute -inset-6 bg-gradient-to-br ${project.tone}`}
+      >
+        <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] [background-size:40px_40px]" />
+        <div className="absolute left-[10%] top-[16%] text-[clamp(3rem,8vw,8rem)] font-semibold tracking-[-0.08em] text-white/10">
+          {project.accent}
+        </div>
+        <div className="absolute bottom-[12%] right-[10%] h-24 w-24 rounded-full border border-white/15 md:h-44 md:w-44" />
+        <div className="absolute bottom-[20%] right-[17%] h-12 w-12 rounded-full bg-white/10 blur-xl md:h-24 md:w-24" />
+      </motion.div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
+    </motion.div>
+  );
+}
+
+export default function Projects() {
+  const [active, setActive] = useState<number | null>(null);
+
+  return (
+    <section id="projects" className="relative bg-[#080808] px-6 py-28 text-white md:px-10 md:py-40">
+      <div className="mx-auto max-w-[1500px]">
+        <motion.div
+          initial={{ opacity: 0, y: 35 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          className="mb-16"
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-20 grid gap-8 md:grid-cols-[1fr_320px] md:items-end"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Featured Work</h2>
-          <p className="text-zinc-400 text-lg max-w-xl leading-relaxed">
-            A selection of my recent projects. Building scalable applications with modern technologies.
+          <div>
+            <p className="mb-5 text-[10px] uppercase tracking-[0.22em] text-zinc-500">01 / Selected work</p>
+            <h2 className="text-[clamp(3.5rem,8vw,8rem)] font-medium leading-[0.82] tracking-[-0.07em]">
+              Work that<br />moves people.
+            </h2>
+          </div>
+          <p className="max-w-[300px] text-base leading-7 text-zinc-500">
+            A selection of identities, campaigns and experiences created across food, hospitality and culture.
           </p>
         </motion.div>
 
-        {/* Spotlight Grid Container */}
-        <div 
-          onMouseMove={handleMouseMove}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative group"
-        >
+        <div className="border-t border-white/10">
           {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 30 }}
+            <motion.article
+              key={project.number}
+              initial={{ opacity: 0, y: 45 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -6, scale: 1.01 }}
-              className="relative p-8 rounded-3xl bg-zinc-900/40 border border-zinc-800/80 overflow-hidden backdrop-blur-xl flex flex-col h-full transition-colors hover:border-zinc-700"
+              viewport={{ once: true, amount: 0.18 }}
+              transition={{ duration: 0.8, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              onMouseEnter={() => setActive(index)}
+              onMouseLeave={() => setActive(null)}
+              className="group border-b border-white/10 py-7 md:py-10"
             >
-              {/* Mouse-tracking dynamic spotlight highlight */}
-              <motion.div
-                className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition duration-300"
-                style={{
-                  background: useMotionTemplate`
-                    radial-gradient(
-                      400px circle at ${mouseX}px ${mouseY}px,
-                      rgba(59, 130, 246, 0.12),
-                      transparent 80%
-                    )
-                  `,
-                }}
-              />
-
-              <h3 className="text-2xl font-bold text-white mb-3 relative z-10">{project.title}</h3>
-              <p className="text-zinc-400 mb-8 flex-grow leading-relaxed relative z-10">
-                {project.description}
-              </p>
-              
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-8 relative z-10">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="text-xs font-medium px-3 py-1 rounded-full bg-zinc-800/60 text-zinc-300 border border-zinc-700/50">
-                    {tag}
+              <div className="mb-7 grid grid-cols-[44px_1fr_auto] items-start gap-4 md:grid-cols-[70px_1fr_auto] md:gap-8">
+                <span className="pt-1 text-xs text-zinc-600">{project.number}</span>
+                <div>
+                  <h3 className="text-[clamp(2.5rem,6vw,6rem)] font-medium leading-[0.88] tracking-[-0.065em] transition-transform duration-700 ease-out group-hover:translate-x-2">
+                    {project.title}
+                  </h3>
+                  <p className="mt-4 text-[10px] uppercase tracking-[0.16em] text-zinc-600 md:text-xs">
+                    {project.category}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4 pt-1 text-xs text-zinc-600">
+                  <span className="hidden md:block">{project.year}</span>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 transition-all duration-500 group-hover:-rotate-45 group-hover:border-white/40 group-hover:bg-white group-hover:text-black">
+                    <ArrowUpRight className="h-4 w-4" />
                   </span>
-                ))}
+                </div>
               </div>
 
-              {/* Links */}
-              <div className="flex items-center gap-6 pt-4 border-t border-zinc-800/60 mt-auto relative z-10">
-                <a href={project.demoUrl} className="flex items-center gap-2 text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                  <ExternalLink className="w-4 h-4" /> Live Demo
-                </a>
-                <a href={project.codeUrl} className="flex items-center gap-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
-                  <Code className="w-4 h-4" /> Code
-                </a>
-              </div>
-            </motion.div>
+              <motion.div
+                animate={{
+                  height: active === index ? "auto" : "0px",
+                  opacity: active === index ? 1 : 0,
+                  marginTop: active === index ? 4 : 0,
+                }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <ProjectVisual project={project} />
+              </motion.div>
+            </motion.article>
           ))}
         </div>
-
       </div>
     </section>
   );
